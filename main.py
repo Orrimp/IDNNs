@@ -2,6 +2,8 @@
 Train % plot networks in the information plane
 """
 from idnns.networks import information_network as inet
+
+
 def main():
     #Bulid the netowrk
     print ('Building the network')
@@ -14,6 +16,8 @@ def main():
     print ('Ploting figures')
     #Plot the newtork
     net.plot_network()
+
+
 if __name__ == '__main__':
     main()
 

@@ -28,7 +28,7 @@ def calc_information_1(probTgivenXs, PYgivenTs, PXs, PYs, PTs):
     ITX = Ht - Htx
     return ITX, IYT
 
-def calc_information(probTgivenXs, PYgivenTs, PXs, PYs, PTs):
+def calc_information_2(probTgivenXs, PYgivenTs, PXs, PYs, PTs):
     """Calculate the MI - I(X;T) and I(Y;T)"""
     #PTs = np.nansum(probTgivenXs*PXs, axis=1)
     t_indeces = np.nonzero(PTs)
