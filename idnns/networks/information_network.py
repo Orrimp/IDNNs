@@ -22,9 +22,6 @@ class informationNetwork():
         if args == None:
             args = netp.get_default_parser(num_of_samples)
 
-        # Override args
-        # args.net_type = '7'
-
         # Default code flow
         self.cov_net = args.cov_net
         self.args_calc_information = args.calc_information
@@ -42,15 +39,19 @@ class informationNetwork():
         self.interval_information_display = args.interval_information_display
         self.save_ws = args.save_ws
         self.name = args.data_dir + args.data_name
+
         # The arch of the networks
         self.layers_sizes = netp.select_network_arch(typenet)
+
         # The percents of the train data samples
         self.train_samples = np.linspace(1, 100, 199)[[[x * 2 - 2 for x in index] for index in args.inds]]
         # The indexs that we want to calculate the information for them in logspace interval
+
         self.epochs_indexes = np.unique(np.logspace(np.log2(args.start_samples), np.log2(args.num_ephocs), args.num_of_samples, dtype=int, base=2)) - 1
         max_size = np.max([len(layers_size) for layers_size in self.layers_sizes])
         # load data
         self.data_sets = load_data(self.name, args.random_labels)
+
         # create arrays for saving the data
         self.ws, self.grads, self.information, self.models, self.names, self.networks, self.weights = [
             [[[[None] for k in range(len(self.train_samples))] for j in range(len(self.layers_sizes))]
@@ -69,10 +70,10 @@ class informationNetwork():
                   'lr': args.learning_rate}
 
         self.name_to_save = args.name + "_" + "_".join([str(i) + '=' + str(params[i]) for i in params])
-        params['train_samples'], params['CPUs'], params[
-            'directory'], params['epochsInds'] = self.train_samples, NUM_CORES, self.name_to_save, self.epochs_indexes
+        params['train_samples'], params['CPUs'], params['directory'], params['epochsInds'] = self.train_samples, NUM_CORES, self.name_to_save, self.epochs_indexes
         self.params = params
         self.rand_int = rand_int
+
         # If we trained already the network
         self.traind_network = False
 
@@ -88,7 +89,8 @@ class informationNetwork():
         if not os.path.exists(directory):
             os.makedirs(directory)
         self.dir_saved = directory
-        with open(self.dir_saved + file_to_save, 'wb') as f:
+
+        with open(self.dir_saved + file_to_save, mode='wb') as f:
             cPickle.dump(data, f, protocol=2)
 
     def run_network(self):
@@ -104,8 +106,7 @@ class informationNetwork():
                                                   self.calc_information_last, self.num_of_bins,
                                                   self.interval_information_display, self.save_ws, self.rand_int,
                                                   self.cov_net)
-                                                 for i in range(len(self.train_samples)) for j in
-                                                 range(len(self.layers_sizes)) for k in range(self.num_of_repeats))
+                                                 for i in range(len(self.train_samples)) for j in range(len(self.layers_sizes)) for k in range(self.num_of_repeats))
 
         else:
             results = [nn.train_and_calc_inf_network(i, j, k,
