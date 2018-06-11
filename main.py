@@ -23,7 +23,8 @@ if __name__ == '__main__':
     args = netp.get_default_parser(None)
     args.data_name = 'MNIST'
     args.learning_rate = 0.01
-    args.num_ephocs = 4000
-    args = None
+    args.num_ephocs = 1000
+    args.interval_information_display=2
+    args.num_of_samples = 50
     main(args)
 

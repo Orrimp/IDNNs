@@ -67,4 +67,5 @@ def get_scope_variable(name_scope, var, shape=None, initializer=None):
         except ValueError:
             scope.reuse_variables()
             v = tf.get_variable(var)
+            variable_summaries(v)
     return v

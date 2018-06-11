@@ -43,10 +43,6 @@ class Model:
             self.activation_function = None
         else:
             self.activation_function = tf.nn.sigmoid
-        self.prediction
-        self.optimize
-        self.accuracy
-        print("CONV LAYER: " + str(cov_net) + "\n" + "LAYER_SIZE: " + str(layerSize))
 
     def initilizae_layer(self, name_scope, row_size, col_size, activation_function, last_hidden):
         # Bulid layer of the network with weights and biases
@@ -92,8 +88,7 @@ class Model:
                     name_scope = 'hidden' + str(i - 1)
                     row_size, col_size = self.all_layer_sizes[i - 1], self.all_layer_sizes[i]
                     activation_function = self.activation_function
-                    last_hidden = self.initilizae_layer(name_scope, row_size, col_size, activation_function,
-                                                        last_hidden)
+                    last_hidden = self.initilizae_layer(name_scope, row_size, col_size, activation_function, last_hidden)
                 name_scope = 'final_layer'
                 row_size, col_size = self.layerSize[-1], self.num_of_classes
                 activation_function = tf.nn.softmax
@@ -132,8 +127,7 @@ class Model:
 
     @lazy_property
     def cross_entropy(self):
-        cross_entropy = tf.reduce_mean(
-            -tf.reduce_sum(self.labels * tf.log(tf.clip_by_value(self.prediction, 1e-50, 1.0)), reduction_indices=[1]))
+        cross_entropy = tf.reduce_mean( -tf.reduce_sum(self.labels * tf.log(tf.clip_by_value(self.prediction, 1e-50, 1.0)), reduction_indices=[1]))
         tf.summary.scalar('cross_entropy', cross_entropy)
         return cross_entropy
 
@@ -172,7 +166,7 @@ class Model:
         return layer_values
 
     def update_weights_and_calc_values_temp(self, d_w_i_j, layer_to_perturbe, i, j, X):
-        """Update the weights of the given layer cacl the output and return it to the original values"""
+        """Update the weights of the given layer calc the output and return it to the original values"""
         if layer_to_perturbe + 1 >= len(self.hidden_layers):
             scope_name = 'softmax_linear'
         else:

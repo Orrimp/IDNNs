@@ -1,4 +1,4 @@
-0
+
 '''
 Calculate the information in the network
 Can be by the full distribution rule (for small netowrk) or bt diffrenet approximation method
@@ -179,8 +179,7 @@ def extract_probs(label, x):
     return pys, pys1, p_y_given_x, b1, b, unique_a, unique_inverse_x, unique_inverse_y, pxs
 
 
-def get_information(ws, x, label, num_of_bins, interval_information_display, model, layerSize,
-                    calc_parallel=True, py_hats=0):
+def get_information(ws, x, label, num_of_bins, interval_information_display, model, layerSize, calc_parallel=True, py_hats=0):
     """Calculate the information for the network for all the epochs and all the layers"""
     print('Start calculating the information...')
     bins = np.linspace(-1, 1, num_of_bins)
@@ -195,9 +194,7 @@ def get_information(ws, x, label, num_of_bins, interval_information_display, mod
                                       pxs, p_y_given_x, pys1, model.save_file, x.shape[1], layerSize)
                                      for i in range(len(ws))))
     else:
-        params = np.array([calc_information_for_epoch
-                           (i, interval_information_display, ws[i], bins, unique_inverse_x, unique_inverse_y,
-                            label, b, b1, len(unique_a), pys,
-                            pxs, p_y_given_x, pys1, model.save_file, x.shape[1], layerSize)
+        params = np.array([calc_information_for_epoch(i, interval_information_display, ws[i], bins, unique_inverse_x, unique_inverse_y,
+                            label, b, b1, len(unique_a), pys, pxs, p_y_given_x, pys1, model.save_file, x.shape[1], layerSize)
                            for i in range(len(ws))])
     return params

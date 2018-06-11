@@ -23,17 +23,14 @@ def build_model(activation_function, layerSize, input_size, num_of_classes, lear
     return model
 
 
-def train_and_calc_inf_network(i, j, k, layerSize, num_of_ephocs, learning_rate_local, batch_size, indexes, save_grads,
-                               data_sets_org,
-                               model_type, percent_of_train, interval_accuracy_display, calc_information,
-                               calc_information_last, num_of_bins,
-                               interval_information_display, save_ws, rand_int, cov_net):
+def train_and_calc_inf_network(train_sample_nr, current_layer_size, repeat_nr, layerSize, num_of_ephocs, learning_rate_local, batch_size, epoch_indexes, save_grads, data_sets_org,
+                               model_type, percent_of_train, interval_accuracy_display, calc_information, calc_information_last, num_of_bins, interval_information_display, save_ws, rand_int, cov_net):
+
     """Train the network and calculate it's information"""
-    network_name = '{0}_{1}_{2}_{3}'.format(i, j, k, rand_int)
+    network_name = '{0}_{1}_{2}_{3}'.format(train_sample_nr, current_layer_size, repeat_nr, rand_int)
     print('Training network  - {0}'.format(network_name))
-    network = train_network(layerSize, num_of_ephocs, learning_rate_local, batch_size, indexes, save_grads,
-                            data_sets_org, model_type, percent_of_train, interval_accuracy_display, network_name,
-                            cov_net)
+    network = train_network(layerSize, num_of_ephocs, learning_rate_local, batch_size, epoch_indexes, save_grads, data_sets_org, model_type, percent_of_train, interval_accuracy_display, network_name, cov_net)
+
     network['information'] = []
     if calc_information:
         print('Calculating the infomration')

@@ -323,9 +323,7 @@ def load_figures(mode, str_names=None):
         title_strs = [['One hidden layer', 'Two hidden layers','Three hidden layers'], ['Four hidden layers',
                       'Five hidden layers', 'Six hidden layers']]
 
-        title_strs = [['5 Bins', '10 Bins', '15 Bins'], ['20 Bins',
-                                                                                         '25 Bins',
-                                                                                         '35 Bins']]
+        title_strs = [['5 Bins', '10 Bins', '15 Bins'], ['20 Bins','25 Bins','35 Bins']]
         f, (axes) = plt.subplots(2, 3, sharex=True, sharey=True, figsize=fig_size)
         f.subplots_adjust(left=0.09, bottom=0.1, right=.92, top=0.94, wspace=0.03, hspace=0.15)
         colorbar_axis = [0.93, 0.1, 0.035, 0.76]

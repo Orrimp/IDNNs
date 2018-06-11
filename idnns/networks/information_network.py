@@ -26,7 +26,7 @@ class informationNetwork():
         self.cov_net = args.cov_net
         self.args_calc_information = args.calc_information
         self.calc_information = self.args_calc_information
-        self.run_in_parallel = args.run_in_parallel
+        self.run_in_parallel = False
         self.num_ephocs = args.num_ephocs
         self.learning_rate = args.learning_rate
         self.batch_size = args.batch_size
@@ -45,10 +45,11 @@ class informationNetwork():
 
         # The percents of the train data samples
         self.train_samples = np.linspace(1, 100, 199)[[[x * 2 - 2 for x in index] for index in args.inds]]
-        # The indexs that we want to calculate the information for them in logspace interval
 
+        # The indexs that we want to calculate the information for them in logspace interval
         self.epochs_indexes = np.unique(np.logspace(np.log2(args.start_samples), np.log2(args.num_ephocs), args.num_of_samples, dtype=int, base=2)) - 1
         max_size = np.max([len(layers_size) for layers_size in self.layers_sizes])
+
         # load data
         self.data_sets = load_data(self.name, args.random_labels)
 
@@ -63,10 +64,13 @@ class informationNetwork():
 
         params = {'sampleLen': len(self.train_samples),
                   'nDistSmpls': args.nDistSmpls,
-                  'layerSizes': ",".join(str(i) for i in self.layers_sizes[0]), 'nEpoch': args.num_ephocs,
+                  'layerSizes': ",".join(str(i) for i in self.layers_sizes[0]),
+                  'nEpoch': args.num_ephocs,
                   'batch': args.batch_size,
-                  'nRepeats': args.num_of_repeats, 'nEpochInds': len(self.epochs_indexes),
-                  'LastEpochsInds': self.epochs_indexes[-1], 'DataName': args.data_name,
+                  'nRepeats': args.num_of_repeats,
+                  'nEpochInds': len(self.epochs_indexes),
+                  'LastEpochsInds': self.epochs_indexes[-1],
+                  'DataName': args.data_name,
                   'lr': args.learning_rate}
 
         self.name_to_save = args.name + "_" + "_".join([str(i) + '=' + str(params[i]) for i in params])
@@ -106,7 +110,9 @@ class informationNetwork():
                                                   self.calc_information_last, self.num_of_bins,
                                                   self.interval_information_display, self.save_ws, self.rand_int,
                                                   self.cov_net)
-                                                 for i in range(len(self.train_samples)) for j in range(len(self.layers_sizes)) for k in range(self.num_of_repeats))
+                                                 for i in range(len(self.train_samples))
+                                                 for j in range(len(self.layers_sizes))
+                                                 for k in range(self.num_of_repeats))
 
         else:
             results = [nn.train_and_calc_inf_network(i, j, k,
@@ -119,8 +125,9 @@ class informationNetwork():
                                                      self.calc_information_last, self.num_of_bins,
                                                      self.interval_information_display,
                                                      self.save_ws, self.rand_int, self.cov_net)
-                       for i in range(len(self.train_samples)) for j in range(len(self.layers_sizes)) for k in
-                       range(self.num_of_repeats)]
+                       for i in range(len(self.train_samples))
+                       for j in range(len(self.layers_sizes))
+                       for k in range(self.num_of_repeats)]
 
         # Extract all the measures and orgainze it
         for i in range(len(self.train_samples)):
@@ -151,8 +158,9 @@ class informationNetwork():
             self.information = np.array(
                 [inn.get_information(self.ws[k][j][i], self.data_sets.data, self.data_sets.labels,
                                      self.args.num_of_bins, self.args.interval_information_display, self.epochs_indexes)
-                 for i in range(len(self.train_samples)) for j in
-                 range(len(self.layers_sizes)) for k in range(self.args.num_of_repeats)])
+                 for i in range(len(self.train_samples))
+                 for j in range(len(self.layers_sizes))
+                 for k in range(self.args.num_of_repeats)])
         else:
             print('Cant calculate the infomration of the networks!!!')
 
@@ -167,6 +175,6 @@ class informationNetwork():
 
     def plot_network(self):
         str_names = [[self.dir_saved]]
-        mode = 2
+        mode = 0
         save_name = 'figure'
         plt_fig.plot_figures(str_names, mode, save_name)
