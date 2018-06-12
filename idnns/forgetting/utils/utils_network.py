@@ -1,15 +1,13 @@
 import tensorflow as tf
 import numpy as np
 
-initializer = {'rand_norm': tf.random_normal_initializer,
+initializers = {'rand_norm': tf.random_normal_initializer,
                    'rand_uniform': tf.random_uniform_initializer,
                    'zero': tf.zeros_initializer,
                    'zero_float': tf.constant_initializer(0.0),
                    'truncated': tf.truncated_normal_initializer,
                    'xavier_normal': tf.glorot_normal_initializer,
                    'xavier_uniform': tf.glorot_uniform_initializer}
-
-default_collections = tf.GraphKeys.GLOBAL_VARIABLES, tf.GraphKeys.TRAINABLE_VARIABLES
 
 
 def create_layer(name_scope, activation_function, prev_layer, row_size, col_size):
@@ -22,14 +20,13 @@ def create_layer(name_scope, activation_function, prev_layer, row_size, col_size
         layer_input = tf.matmul(prev_layer, weights) + biases
         new_layer = activation_function(layer_input, name='output')
 
-    print("Creating layer with ", end='')
+    print("Creating " + str(name_scope) + " with ", end='')
     print(' prev_layer ' + str(prev_layer.shape) , end='')
     print(' row_size ' + str(row_size), end='')
     print(' col_size ' + str(col_size), end='')
     print(' weights ' + str(weights.shape), end='')
     print(' biases' + str(biases.shape), end='')
     print(' new_layer ' + str(new_layer.shape), end='')
-
 
     return weights, biases, new_layer
 
@@ -40,19 +37,21 @@ def default_activation_func():
 
 
 def intializer_func(name):
-    return initializer[name]
+    return initializers[name]
 
 
 def get_scope_variable(name_scope, type, shape, initializer=None):
     """Create or reuse variables and add some additional information to it"""
     """By default tensorflow places all the variable into GLOBAL_VARIABLES and TRAINABLE_VARIABLES, we override it -> fix it by adding GLOBAL and TRAINABLE or the intializer will not work"""
 
-    with tf.variable_scope(name_scope) as scope:
+    with tf.variable_scope(name_scope, reuse=tf.AUTO_REUSE) as scope:
         try:
-            v = tf.get_variable(name=type, collections=[type, default_collections], shape=shape, initializer=initializer)
+            print("Initializing " + name_scope + " " + type)
+            v = tf.get_variable(name=type, collections=[type, tf.GraphKeys.GLOBAL_VARIABLES, tf.GraphKeys.TRAINABLE_VARIABLES], shape=shape, initializer=initializer)
         except ValueError:
+            print("Error initializing " + name_scope + " " + type)
             scope.reuse_variables()
-            v = tf.get_variable(name=type, collections=[type, default_collections], shape=shape, initializer=initializer)
+            v = tf.get_variable(name=type, collections=[type, tf.GraphKeys.GLOBAL_VARIABLES, tf.GraphKeys.TRAINABLE_VARIABLES], shape=shape, initializer=initializer)
 
     return variable_summaries(v)
 
@@ -74,3 +73,4 @@ def variable_summaries(var):
 
 def placeholder_var(size, batch_size, name):
     return tf.placeholder(tf.float32, [batch_size, size], name=name)
+

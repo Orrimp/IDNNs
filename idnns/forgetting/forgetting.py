@@ -7,14 +7,16 @@ class Forgetting:
     def __init__(self):
 
         args = create_args()
-       # layer_sizes = np.array(["784", "dropout", "400", "dropout", "100", "dropout", "50", "dropout", "10"])
-        layer_sizes = np.array(["784", "400", "100", "50", "10"])
+        layer_sizes = np.array(["784", "dropout", "400", "dropout", "100", "dropout", "50", "10"])
+        #layer_sizes = np.array(["784", "400", "100", "50", "10"])
 
         #layer_sizes = np.array(["784", "400", "100", "50", "10"])
 
         network = DnnModel(layers_params=layer_sizes, args=args)
-        network.create_network_layers()
         #network = network.init_information_collector(target, interval, mode)
+        network = network.create_network_layers()
+        network = network.init_hyperparams()
+        network = network.init_network()
         network.train_network()
         network.evaluate_network()
 

@@ -1,8 +1,9 @@
 from idnns.forgetting.interfaces.I_Model import I_Model
 from idnns.forgetting.storage import Storage
-from idnns.forgetting.utils_network import create_layer, default_activation_func, placeholder_var
-from idnns.forgetting.utils_data import load_mnist_data, MNIST_TRAIN_SIZE
-from idnns.forgetting.config import parse, extract_dims
+from idnns.forgetting.utils.constants import Const
+from idnns.forgetting.utils.utils_network import create_layer, default_activation_func, placeholder_var
+from idnns.forgetting.utils.utils_data import load_mnist_data, MNIST_TRAIN_SIZE
+from idnns.forgetting.utils.config import parse, extract_dims
 import tensorflow as tf
 
 tf.logging.set_verbosity(tf.logging.INFO)
@@ -47,7 +48,7 @@ class DnnModel(I_Model):
                 print("Creating layer with " + str(row_size) + " x " + str(col_size))
 
             if value is None and instruction == "dropout":
-                prev_hidden = tf.layers.dropout(prev_hidden, training=True)
+                prev_hidden = tf.layers.dropout(prev_hidden, training=True, name='hidden_layer' + str(layer_index))
                 print("Creating layer dropout")
 
         row_size, col_size = self.layers_params[-2], self.layers_params[-1]
@@ -64,33 +65,28 @@ class DnnModel(I_Model):
         feed_dict = {self.input:images, self.label_placeholder:labels}
         return feed_dict
 
-    def optimizer(self):
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.label_placeholder * tf.log(self.last_layer), reduction_indices=[1]))
-        optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(cross_entropy)
-        grads = tf.gradients(cross_entropy, tf.trainable_variables())
+    def init_hyperparams(self):
+        self.cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.label_placeholder * tf.log(self.last_layer), reduction_indices=[1]))
+        self.optimizer = tf.train.AdadeltaOptimizer(learning_rate=self.learning_rate).minimize(self.cross_entropy, global_step=self.store.global_step)
 
-        return optimizer
+        return self
 
-    def loss(self):
-        correct_prediction = tf.equal(tf.argmax(self.last_layer, 1), tf.argmax(self.label_placeholder, 1))
-        loss = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-        tf.summary.scalar('loss', loss)
+    def init_network(self):
+        self.sess = tf.Session()
+        self.sess.run(tf.global_variables_initializer())
+        file_writer = tf.summary.FileWriter(Const.LOG_LOC.value, self.sess.graph)
 
-        return loss
+        return self
 
     def train_network(self):
         """Train the nework"""
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.label_placeholder * tf.log(self.last_layer), reduction_indices=[1]))
-        optimizer = tf.train.AdadeltaOptimizer(learning_rate=self.learning_rate)\
-            .minimize(cross_entropy, global_step=self.store.global_step)
-
         # Initialize the network
-        self.sess = tf.Session()
-        self.sess.run(tf.global_variables_initializer())
+
+        #self.init_network()
 
         # Go over the epochs
         for j in range(0, self.num_of_iterations):
-            summary, result = self.sess.run([optimizer, cross_entropy], feed_dict=self.fill_feed_dict(True))
+            summary, result = self.sess.run([self.optimizer, self.cross_entropy], feed_dict=self.fill_feed_dict(True))
             if (j % self.interval_to_print) == 0:
                     print("Current step %d with training loss %g" % (j, result))
                     self.extract_and_save_state()
@@ -114,4 +110,7 @@ class DnnModel(I_Model):
         self.store.print_state()
 
         return True
+
+    def close(self):
+        self.sess.close()
 
