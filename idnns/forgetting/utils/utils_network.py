@@ -53,6 +53,7 @@ def get_scope_variable(name_scope, type, shape, initializer=None):
             scope.reuse_variables()
             v = tf.get_variable(name=type, collections=[type, tf.GraphKeys.GLOBAL_VARIABLES, tf.GraphKeys.TRAINABLE_VARIABLES], shape=shape, initializer=initializer)
 
+    # TODO change to: Add varaibles to the collections later with "tf.add_to_collection(name varaible)
     return variable_summaries(v)
 
 

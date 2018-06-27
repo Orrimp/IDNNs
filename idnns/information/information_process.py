@@ -10,6 +10,7 @@ import tensorflow as tf
 import idnns.information.information_utilities as inf_ut
 from idnns.networks import model as mo
 from idnns.information.mutual_info_estimation import calc_varitional_information
+import sys
 
 warnings.filterwarnings("ignore")
 from joblib import Parallel, delayed
@@ -65,6 +66,7 @@ def calc_information_for_layer_with_other(data, bins, unique_inverse_x, unique_i
     local_IXT, local_ITY = calc_information_sampling(data, bins, pys1, pxs, label, b, b1,
                                                      len_unique_a, p_YgX, unique_inverse_x,
                                                      unique_inverse_y)
+
     number_of_indexs = int(data.shape[1] * (1. / 100 * percent_of_sampling))
     indexs_of_sampls = np.random.choice(data.shape[1], number_of_indexs, replace=False)
     if percent_of_sampling != 100:
@@ -159,6 +161,7 @@ def calc_information_for_epoch(iter_index, interval_information_display, ws_iter
 
 def extract_probs(label, x):
     """calculate the probabilities of the given data and labels p(x), p(y) and (y|x)"""
+    print("Extracting probability for layer " + str(x.shape))
     pys = np.sum(label, axis=0) / float(label.shape[0])
     b = np.ascontiguousarray(x).view(np.dtype((np.void, x.dtype.itemsize * x.shape[1])))
     unique_array, unique_indices, unique_inverse_x, unique_counts = \
@@ -171,11 +174,13 @@ def extract_probs(label, x):
         indexs = unique_inverse_x == i
         py_x_current = np.mean(label[indexs, :], axis=0)
         p_y_given_x.append(py_x_current)
+        k = label[indexs, :]
     p_y_given_x = np.array(p_y_given_x).T
     b_y = np.ascontiguousarray(label).view(np.dtype((np.void, label.dtype.itemsize * label.shape[1])))
     unique_array_y, unique_indices_y, unique_inverse_y, unique_counts_y = \
         np.unique(b_y, return_index=True, return_inverse=True, return_counts=True)
     pys1 = unique_counts_y / float(np.sum(unique_counts_y))
+
     return pys, pys1, p_y_given_x, b1, b, unique_a, unique_inverse_x, unique_inverse_y, pxs
 
 

@@ -4,9 +4,10 @@ import scipy.special
 from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 
+from idnns.forgetting.information.probability import extract_probs
+
 
 class Information:
-
 
     def __init__(self, num_max_epochs, num_of_samples, interval_information_display=499):
         self.interval_information_display = interval_information_display
@@ -17,53 +18,22 @@ class Information:
     def get_information(self, ws, input_x, label):
         """Calculate the information for the network for all the epochs and all the layers"""
         print('Start calculating the information...')
-        # Generated a linear vector from -1 to 1 with 30 steps
-        bins = np.linspace(start=-1, stop=1, num=30)
-        label = np.array(label).astype(np.float)
 
-        params = np.array([self.calc_information_for_epoch(index, ws[index], bins, input_x, label) for index in range(len(ws))])
-        return params
+        return np.array([self.calc_information_for_epoch(index, ws[index], input_x, label) for index in range(len(ws))])
 
-    def calc_information_for_epoch(self, iter_index, ws_iter_index, bins, input_x, label):
+    def calc_information_for_epoch(self, iter_index, ws_iter_index, input_x, label):
         """Calculate the information for all the layers for specific epoch"""
 
         np.random.seed(None)
-        params = self.__extract_probs(label, input_x)
+        # Generated a linear vector from -1 to 1 with 30 steps
+        bins = np.linspace(start=-1, stop=1, num=30)
+        label = np.array(label).astype(np.float)
+        params = extract_probs(label, input_x)
         params = np.array([self.calc_information_sampling(data=ws_iter_index[i], bins=bins, label=label, parapms=params)
                            for i in range(len(ws_iter_index))])
 
         if np.mod(iter_index, self.interval_information_display) == 0:
             print('Calculated The information of epoch number - {0}'.format(iter_index))
-        return params
-
-    def __extract_probs(self, label, input):
-        """calculate the probabilities of the given data and labels p(x), p(y) and (y|x)"""
-        pys = np.sum(label, axis=0) / float(label.shape[0])
-        b = np.ascontiguousarray(input).view(np.dtype((np.void, input.dtype.itemsize * input.shape[1])))
-        unique_array, unique_indices, unique_inverse_x, unique_counts = np.unique(b, return_index=True,return_inverse=True, return_counts=True)
-        unique_a = input[unique_indices]
-        b1 = np.ascontiguousarray(unique_a).view(np.dtype((np.void, unique_a.dtype.itemsize * unique_a.shape[1])))
-        pxs = unique_counts / float(np.sum(unique_counts))
-        p_y_given_x = []
-        for i in range(0, len(unique_array)):
-            indexs = unique_inverse_x == i
-            py_x_current = np.mean(label[indexs, :], axis=0)
-            p_y_given_x.append(py_x_current)
-
-        p_y_given_x = np.array(p_y_given_x).T
-        b_y = np.ascontiguousarray(label).view(np.dtype((np.void, label.dtype.itemsize * label.shape[1])))
-        unique_array_y, unique_indices_y, unique_inverse_y, unique_counts_y = np.unique(b_y, return_index=True, return_inverse=True, return_counts=True)
-        pys1 = unique_counts_y / float(np.sum(unique_counts_y))
-
-        params = {}
-        params['pys'] = pys
-        params['pys1'] = pys1
-        params['p_y_given_x'] = p_y_given_x
-        params['b'] = b
-        params['b1'] = b1
-        params['unique_a'] = unique_a
-        params['unique_inverse_x'] = unique_inverse_x
-        params['unique_inverse_y'] = unique_inverse_y
         return params
 
     def calc_by_sampling_neurons(self, ws_iter_index, num_of_samples, label, sigma, bins, pxs):
