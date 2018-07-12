@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
-from idnns.forgetting.utils.utils_network import placeholder_var
-from idnns.gan.utils import init_loss
+from idnns.gan.utils import init_loss, placeholder_var
 from idnns.gan.visual import Visual
 from idnns.gan.store import Store
 
