@@ -8,7 +8,7 @@ def parse(layers_param):
         return None, instruction
 
 
-def extract_dims(layers_params, current_index):
+def extract_dimensions(layers_params, current_index):
     current_value = int(layers_params[current_index])
     prev_value = None
     not_found = True

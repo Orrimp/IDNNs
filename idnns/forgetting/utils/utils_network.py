@@ -75,3 +75,5 @@ def variable_summaries(var):
 def placeholder_var(size, batch_size, name):
     return tf.placeholder(tf.float32, [batch_size, size], name=name)
 
+def placeholder_var(size, name):
+    return tf.placeholder(tf.float32, size, name=name)

@@ -3,7 +3,7 @@ from idnns.forgetting.storage import Storage
 from idnns.forgetting.utils.constants import Const
 from idnns.forgetting.utils.utils_network import create_layer, default_activation_func, placeholder_var
 from idnns.forgetting.utils.utils_data import load_mnist_data, MNIST_TRAIN_SIZE
-from idnns.forgetting.utils.config import parse, extract_dims
+from idnns.forgetting.utils.config import parse, extract_dimensions
 import tensorflow as tf
 
 tf.logging.set_verbosity(tf.logging.INFO)
@@ -37,13 +37,14 @@ class DnnModel(I_Model):
         self.store = Storage(self.num_of_iterations, args.interval_to_print)
 
     def create_network_layers(self):
-        # Create layers but ignore the first and the lasst value inside the layer description because its the input and output dimensions.
+        """Create layers but ignore the first and the lasst value inside the layer description because its the input and output dimensions."""
         prev_hidden = self.input
         for layer_index in range(1, len(self.layers_params)-1):
+            """We can mix instructions into the layer_params such as 'dropout'"""
             value, instruction = parse(self.layers_params[layer_index])
 
             if instruction is None:
-                row_size, col_size = extract_dims(self.layers_params, layer_index)
+                row_size, col_size = extract_dimensions(self.layers_params, layer_index)
                 weights, biases, prev_hidden = create_layer('hidden_layer' + str(layer_index), self.activation_func['hidden'], prev_hidden, row_size, col_size)
                 print("Creating layer with " + str(row_size) + " x " + str(col_size))
 
@@ -51,6 +52,7 @@ class DnnModel(I_Model):
                 prev_hidden = tf.layers.dropout(prev_hidden, training=True, name='hidden_layer' + str(layer_index))
                 print("Creating layer dropout")
 
+        """Create the last output layer """
         row_size, col_size = self.layers_params[-2], self.layers_params[-1]
         weights, biases, self.last_layer = create_layer('output_layer', self.activation_func['output'], prev_hidden, row_size, col_size)
 

@@ -54,3 +54,5 @@ def _calc_prob_unique(contiguous_array):
 
 def _calc_prob_flat(array):
     return np.divide(array, np.sum(array))
+
+

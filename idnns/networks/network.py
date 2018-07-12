@@ -51,8 +51,7 @@ def exctract_activity(sess, batch_points_all, model, data_sets_org):
         batch_xs = data_sets_org.data[batch_points_all[i]:batch_points_all[i + 1]]
         batch_ys = data_sets_org.labels[batch_points_all[i]:batch_points_all[i + 1]]
         feed_dict_temp = {model.x: batch_xs, model.labels: batch_ys}
-        w_temp_local = sess.run([model.hidden_layers],
-                                feed_dict=feed_dict_temp)
+        w_temp_local = sess.run([model.hidden_layers],feed_dict=feed_dict_temp)
         for s in range(len(w_temp_local[0])):
             if i == 0:
                 w_temp.append(w_temp_local[0][s])
@@ -91,7 +90,7 @@ def train_network(layerSize, num_of_ephocs, learning_rate_local, batch_size, ind
     """Train the nework"""
     tf.reset_default_graph()
     data_sets = data_shuffle(data_sets_org, percent_of_train)
-    ws, estimted_label, gradients, infomration, models, weights = [[None] * len(indexes) for _ in range(6)]
+    weights_activated, estimted_label, gradients, infomration, models, weights = [[None] * len(indexes) for _ in range(6)]
     loss_func_test, loss_func_train, test_prediction, train_prediction = [np.zeros((len(indexes))) for _ in range(4)]
     input_size = data_sets_org.data.shape[1]
     num_of_classes = data_sets_org.labels.shape[1]
@@ -120,7 +119,7 @@ def train_network(layerSize, num_of_ephocs, learning_rate_local, batch_size, ind
         for j in range(0, num_of_ephocs):
             epochs_grads = []
             if j in indexes:
-                ws[k] = exctract_activity(sess, batch_points_all, model, data_sets_org)
+                weights_activated[k] = exctract_activity(sess, batch_points_all, model, data_sets_org)
             # Print accuracy
             if np.mod(j, interval_accuracy_display) == 1 or interval_accuracy_display == 1:
                 print_accuracy(batch_points_test, data_sets, model, sess, j, acc_train_array)
@@ -152,7 +151,7 @@ def train_network(layerSize, num_of_ephocs, learning_rate_local, batch_size, ind
                 # saver.save(sess, model.save_file, global_step=k, write_meta_graph=write_meta)
                 k += 1
     network = {}
-    network['ws'] = ws
+    network['weights_activated'] = weights_activated
     network['test_prediction'] = test_prediction
     network['train_prediction'] = train_prediction
     network['loss_test'] = loss_func_test

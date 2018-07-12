@@ -74,9 +74,7 @@ def calc_information_for_layer_with_other(data, bins, unique_inverse_x, unique_i
         sampled_local_IXT, sampled_local_ITY = calc_information_sampling(
             sampled_data, bins, pys1, pxs, label, b, b1, len_unique_a, p_YgX, unique_inverse_x, unique_inverse_y)
 
-    params = {}
-    params['local_IXT'] = local_IXT
-    params['local_ITY'] = local_ITY
+    params = {'local_IXT': local_IXT, 'local_ITY': local_ITY}
     return params
 
 
@@ -184,7 +182,7 @@ def extract_probs(label, x):
     return pys, pys1, p_y_given_x, b1, b, unique_a, unique_inverse_x, unique_inverse_y, pxs
 
 
-def get_information(ws, x, label, num_of_bins, interval_information_display, model, layerSize, calc_parallel=True, py_hats=0):
+def get_information(weights_activated, x, label, num_of_bins, interval_information_display, model, layerSize, calc_parallel=True, py_hats=0):
     """Calculate the information for the network for all the epochs and all the layers"""
     print('Start calculating the information...')
     bins = np.linspace(-1, 1, num_of_bins)
@@ -193,13 +191,13 @@ def get_information(ws, x, label, num_of_bins, interval_information_display, mod
     if calc_parallel:
         params = np.array(Parallel(n_jobs=NUM_CORES
                                    )(delayed(calc_information_for_epoch)
-                                     (i, interval_information_display, ws[i], bins, unique_inverse_x, unique_inverse_y,
+                                     (i, interval_information_display, weights_activated[i], bins, unique_inverse_x, unique_inverse_y,
                                       label,
                                       b, b1, len(unique_a), pys,
                                       pxs, p_y_given_x, pys1, model.save_file, x.shape[1], layerSize)
-                                     for i in range(len(ws))))
+                                     for i in range(len(weights_activated))))
     else:
-        params = np.array([calc_information_for_epoch(i, interval_information_display, ws[i], bins, unique_inverse_x, unique_inverse_y,
-                            label, b, b1, len(unique_a), pys, pxs, p_y_given_x, pys1, model.save_file, x.shape[1], layerSize)
-                           for i in range(len(ws))])
+        params = np.array([calc_information_for_epoch(i, interval_information_display, weights_activated[i], bins, unique_inverse_x, unique_inverse_y,
+                                                      label, b, b1, len(unique_a), pys, pxs, p_y_given_x, pys1, model.save_file, x.shape[1], layerSize)
+                           for i in range(len(weights_activated))])
     return params

@@ -25,3 +25,5 @@ def stats_entropy(x, base=2):
     counter = Counter(x)
     return  stats.entropy([x for x in counter.values()], base=base)
 
+def entropy_prob(x):
+    # https: // recast.ai / blog / introduction - information - theory - care /
