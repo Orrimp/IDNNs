@@ -79,7 +79,7 @@ class DCGAN:
             fixed_p = root + 'Fixed_results/' + model + str(epoch + 1) + '.png'
             fixed_z_ = np.random.normal(0, 1, (25, 1, 1, 100))
             test_images = sess.run(self.G_z, {self.z: fixed_z_, self.is_training: False})
-            self.visual.show_result(test_images, epoch, True, True, path=fixed_p)
+            self.visual.show_result(test_images, num_epoch=epoch, show=False, save=True, path=fixed_p)
             self.store.hist_append('D_losses', np.mean(D_losses))
             self.store.hist_append('G_losses', np.mean(G_losses))
             self.store.hist_append('per_epoch_ptimes', per_epoch_ptime)
@@ -90,7 +90,7 @@ class DCGAN:
         self.store.hist_append('total_ptime', total_ptime)
 
         print('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (np.mean(self.store.retrieve('per_epoch_ptimes')), self.train_epoch, total_ptime))
-        self.visual.show_train_hist(self.store.retrieve('D_losses'), self.store.retrieve('G_losses'), save=True, path=root + model + 'train_hist.png')
+        self.visual.show_train_hist(self.store.retrieve('D_losses'), self.store.retrieve('G_losses'), show=False, save=True, path=root + model + 'train_hist.png')
 
         images = []
         for e in range(self.train_epoch):
