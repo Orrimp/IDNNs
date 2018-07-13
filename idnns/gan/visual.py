@@ -1,12 +1,10 @@
 import os, time, itertools, imageio, pickle
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+import matplotlib
 import idnns.gan.store
 import numpy as np
 
-if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using non-interactive Agg backend')
-    mpl.use('Agg')
+matplotlib.use('Agg')
 
 
 class Visual:
