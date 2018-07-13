@@ -5,6 +5,7 @@ import idnns.gan.store
 import numpy as np
 
 matplotlib.use('Agg')
+plt.switch_backend('agg')
 
 
 class Visual:
