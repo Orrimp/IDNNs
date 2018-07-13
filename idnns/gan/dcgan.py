@@ -1,4 +1,4 @@
-import os, time, imageio, itertools, pickle
+import os, time, imageio, itertools, pickle, argparse
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
@@ -160,6 +160,10 @@ def define_generator(input, is_training=True, reuse=False):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-batch_size', '-b', dest="batch_size", default=100, type=int, help='The size of the batch')
+    args = parser.parse_args()
+
     root = 'MNIST_DCGAN_results/'
     model = 'MNIST_DCGAN_'
     if not os.path.isdir(root):
@@ -167,5 +171,5 @@ if __name__ == "__main__":
     if not os.path.isdir(root + 'Fixed_results'):
         os.mkdir(root + 'Fixed_results')
 
-    gan = DCGAN(batch_size=100, train_epoch=1, lr=0.001)
+    gan = DCGAN(batch_size=args.batch_size, train_epoch=1, lr=0.001)
     gan.train()
