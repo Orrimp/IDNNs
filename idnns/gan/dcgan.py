@@ -162,6 +162,9 @@ def define_generator(input, is_training=True, reuse=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('-batch_size', '-b', dest="batch_size", default=100, type=int, help='The size of the batch')
+    parser.add_argument('-train_epoch', '-e', dest="train_epoch", default=20, type=int, help='The size of the batch')
+    parser.add_argument('-learning_rate', '-lr', dest="learning_rate", default=0.0002, type=float, help='The size of the batch')
+
     args = parser.parse_args()
 
     root = 'MNIST_DCGAN_results/'
@@ -171,5 +174,5 @@ if __name__ == "__main__":
     if not os.path.isdir(root + 'Fixed_results'):
         os.mkdir(root + 'Fixed_results')
 
-    gan = DCGAN(batch_size=args.batch_size, train_epoch=1, lr=0.001)
+    gan = DCGAN(batch_size=args.batch_size, train_epoch=args.train_epoch, lr=args.learning_rate)
     gan.train()
