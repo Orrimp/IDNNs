@@ -49,8 +49,9 @@ class DCGAN:
             D_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.D_loss, var_list=D_vars)
             G_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.G_loss, var_list=G_vars)
 
-        # start the session
-        self.sess = tf.InteractiveSession()
+        # start the session with multi GPU support
+        configuration = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+        self.sess = tf.InteractiveSession(config=configuration)
         tf.global_variables_initializer().run()
 
         train_set = tf.image.resize_images(self.mnist.train.images, [64, 64]).eval()
