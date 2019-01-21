@@ -2,7 +2,7 @@ import math
 import os, time, itertools, imageio, pickle
 import matplotlib.pyplot as plt
 import matplotlib
-import idnns.gan.store
+from store import Store
 import numpy as np
 
 matplotlib.use('Agg')
@@ -11,7 +11,7 @@ plt.switch_backend('agg')
 
 class Visual:
 
-    def __init__(self, store: idnns.gan.store.Store):
+    def __init__(self, store: Store):
         self.store = store
 
     def show_result(self, test_images, num_epoch, show=False, save=False, path='result.png'):
