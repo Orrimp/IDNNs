@@ -167,3 +167,4 @@ venv.bak/
 
 /idnns/forgetting/saves/
 /idnns/forgetting/improved_graph/
+/idnns/gan/MNIST_DCGAN_results/
